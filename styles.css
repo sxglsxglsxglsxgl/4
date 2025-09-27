@@ -72,9 +72,13 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
+  /* Фолбэки на 100vh/svh/dvh сохраняют минимум контента для свайпа ещё до того, как скрипт обновит --viewport-unit. */
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
   min-height: calc(var(--viewport-unit) * 100);
   overflow: visible; /* Не обрезаем контент, чтобы прокрутка происходила у body, а не во внутреннем контейнере. */
-  contain: layout paint size;
+  contain: layout paint; /* Убираем size-контейнмент: он фиксировал высоту .safe-frame на 100dvh и блокировал рост body, из-за чего iOS не видела скролл корня и не скрывала тулбар. */
   z-index: 0;
 }
 
