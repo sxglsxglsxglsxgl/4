@@ -62,13 +62,17 @@ body {
 }
 
 .safe-frame {
-  position: fixed;
-  top: var(--safe-top);
-  right: var(--safe-right);
-  bottom: var(--safe-bottom);
-  left: var(--safe-left);
+  position: relative;
   display: flex;
   flex-direction: column;
+  /* Use padding instead of fixed insets so the root document scrolls and iOS can collapse
+     its toolbar while still honoring dynamic safe areas. */
+  min-height: calc(var(--viewport-unit) * 100);
+  padding:
+    var(--safe-top)
+    var(--safe-right)
+    var(--safe-bottom)
+    var(--safe-left);
   overflow: hidden;
   contain: layout paint size;
   z-index: 0;
@@ -98,9 +102,6 @@ body.is-menu-closing {
 .safe-frame .content {
   position: relative;
   flex: 1 1 auto;
-  height: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .content {
@@ -332,7 +333,9 @@ body.is-menu-closing .site-menu {
 
 main {
   display: block;
-  min-height: 100vh;
+  /* Keep the primary flow sized to the dynamic viewport so browser chrome changes
+     don't freeze the first screen height. */
+  min-height: calc(var(--viewport-unit) * 100);
 }
 
 .site-header {
@@ -500,8 +503,14 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   width: min(920px, 100%);
   margin: 0 auto;
   padding-inline: clamp(24px, 8vw, 140px);
-  padding-block: clamp(48px, 22vh, 200px) clamp(200px, 52vh, 420px);
-  scroll-padding-block: clamp(48px, 22vh, 200px) clamp(200px, 52vh, 420px);
+  /* Use the dynamic viewport unit so the scroll padding adapts as the toolbar
+     expands or collapses, keeping reveal distances consistent. */
+  padding-block:
+    clamp(48px, calc(var(--viewport-unit) * 22), 200px)
+    clamp(200px, calc(var(--viewport-unit) * 52), 420px);
+  scroll-padding-block:
+    clamp(48px, calc(var(--viewport-unit) * 22), 200px)
+    clamp(200px, calc(var(--viewport-unit) * 52), 420px);
   perspective: 1400px;
 }
 
@@ -510,7 +519,9 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
+  /* Each card tracks the dynamic viewport height to guarantee a scrollable
+     surface large enough for iOS to trigger toolbar minimization. */
+  min-height: calc(var(--viewport-unit) * 100);
   text-align: center;
   font-size: clamp(28px, 5vw, 74px);
   line-height: 1.18;
