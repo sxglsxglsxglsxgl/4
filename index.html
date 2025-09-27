@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <title>CLASSNOE MESTO — Inspired Tribute</title>
+  <meta name="description" content="An homage to CLASSNOE MESTO's scrolling narrative experience." />
+  <meta property="og:title" content="CLASSNOE MESTO — Inspired Tribute" />
+  <meta property="og:description" content="An homage to CLASSNOE MESTO's scrolling narrative experience." />
+  <meta property="og:type" content="website" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="safe-frame">
+    <div class="content">
+      <div class="backdrop" aria-hidden="true"></div>
+
+      <header class="site-header">
+        <div class="site-header__inner">
+          <div class="site-lockup">
+            <button
+              class="site-brand"
+              type="button"
+              data-scroll-to-sentences
+              aria-label="CLASSNOE MESTO — scroll to first message"
+            >
+              CLASSNOE MESTO
+            </button>
+          </div>
+          <button
+            class="site-menu-toggle"
+            type="button"
+            data-menu-toggle
+            aria-expanded="false"
+            aria-controls="site-menu"
+            aria-label="Open menu"
+          >
+            <span class="site-menu-toggle__icon" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </span>
+          </button>
+        </div>
+      </header>
+
+      <div
+        id="site-menu"
+        class="site-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Site navigation"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="site-menu__backdrop" data-menu-close></div>
+        <div class="site-menu__container" role="document" tabindex="-1" data-menu-focus>
+          <nav class="site-menu__nav" aria-label="Primary">
+            <ul class="site-menu__list" role="list">
+              <li class="site-menu__item">
+                <a href="#content" class="site-menu__link" data-menu-link>Branding</a>
+              </li>
+              <li class="site-menu__item">
+                <a href="#content" class="site-menu__link" data-menu-link>Packaging</a>
+              </li>
+              <li class="site-menu__item">
+                <a href="#content" class="site-menu__link" data-menu-link>Social Media</a>
+              </li>
+              <li class="site-menu__item">
+                <a href="#content" class="site-menu__link" data-menu-link>Templates</a>
+              </li>
+              <li class="site-menu__item">
+                <a href="#content" class="site-menu__link" data-menu-link>Web Design</a>
+              </li>
+              <li class="site-menu__item">
+                <a href="#content" class="site-menu__link" data-menu-link>Monthly Design</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <main id="content" aria-labelledby="content-title">
+        <h1 id="content-title" class="visually-hidden">CLASSNOE MESTO inspired narrative</h1>
+        <section id="sentences" role="list" aria-live="polite"></section>
+      </main>
+
+      <footer class="site-footer" aria-label="Footer">
+        <div class="site-footer__inner">
+          <div class="site-footer__column">
+            <h2>Inquiries</h2>
+            <a href="mailto:hello@classnoemesto.com">hello@classnoemesto.com</a>
+          </div>
+          <div class="site-footer__column">
+            <h2>Press</h2>
+            <a href="mailto:press@classnoemesto.com">press@classnoemesto.com</a>
+          </div>
+          <div class="site-footer__column">
+            <h2>Follow</h2>
+            <a
+              href="https://www.instagram.com/classnoemesto/"
+              target="_blank"
+              rel="noreferrer noopener"
+            >Instagram</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <pre
+      id="safe-debug"
+      style="position:fixed;left:calc(var(--safe-left) + 8px);bottom:calc(var(--safe-bottom) + 8px);padding:6px 8px;background:rgba(0,0,0,.6);color:#0f0;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;z-index:99999;border-radius:6px;"
+    ></pre>
+  </div>
+
+  <script src="./safe-area.js"></script>
+  <script>
+    (function () {
+      const qs = new URLSearchParams(location.search);
+      if (qs.get('safetest') === '1') {
+        document.documentElement.classList.add('safe-test');
+      }
+    })();
+  </script>
+  <script>
+    const SENTENCES = [
+      "CLASSNOE MESTO is a creative collective of designers, architects, musicians, filmmakers, writers, and engineers.",
+      "We are fascinated by the traditions of craft and defined by the pursuit of excellence.",
+      "We imagine and build products, experiences, and organizations in close partnership with leaders we admire.",
+      "Our curiosity leads us to learn, to question, and to design with a respect for materials and for the people who use them.",
+      "We work from Saint Petersburg, collaborating around the world on projects that make life a little more thoughtful."
+    ];
+    window.SITE_CONFIG = { SENTENCES };
+    console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-top'));
+    console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom'));
+  </script>
+  <script defer src="./script.js"></script>
+  <script>
+    (function () {
+      const qs = new URLSearchParams(location.search);
+      if (!qs.has('debug') || qs.get('debug') !== 'safe') {
+        const dbg = document.getElementById('safe-debug');
+        if (dbg) dbg.remove();
+        return;
+      }
+      function dump() {
+        const cs = getComputedStyle(document.documentElement);
+        const t = cs.getPropertyValue('--safe-top').trim();
+        const r = cs.getPropertyValue('--safe-right').trim();
+        const b = cs.getPropertyValue('--safe-bottom').trim();
+        const l = cs.getPropertyValue('--safe-left').trim();
+        document.getElementById('safe-debug').textContent =
+          `safe-top: ${t}\nsafe-right: ${r}\nsafe-bottom: ${b}\nsafe-left: ${l}`;
+      }
+      dump();
+      window.addEventListener('resize', dump);
+      window.addEventListener('orientationchange', dump);
+      if (window.visualViewport) {
+        visualViewport.addEventListener('resize', dump);
+        visualViewport.addEventListener('scroll', dump);
+      }
+    })();
+  </script>
+</body>
+</html>
