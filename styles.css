@@ -43,12 +43,15 @@
 html,
 body {
   margin: 0;
+  height: auto; /* Разрешаем корневому документу тянуться естественно, чтобы скролл был на body. */
   /* порядок высот: сначала старый fallback, затем современные динамические */
   min-height: 100vh;
   min-height: 100svh;
   min-height: 100dvh;
   background: #000;
   color: #fff;
+  overflow-y: auto; /* Скролл переносится на корень — это нужно для автоскрытия тулбара iOS. */
+  overscroll-behavior-y: auto; /* Не блокируем жесты прокрутки, чтобы браузер мог свернуть панели. */
   /* iOS: раскрытые панели браузера остаются системным хромом — unsafe-зоны видны лишь при схлопнутых панелях или в PWA */
 }
 
@@ -59,21 +62,18 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+  /* Safe-area отступы теперь на корне, чтобы они обновлялись вместе со скроллом body. */
+  scroll-padding-top: calc(var(--safe-top) + 8px); /* Поддерживаем корректные якоря при схлопывании тулбара. */
+  scroll-padding-bottom: calc(var(--safe-bottom) + 8px);
 }
 
 .safe-frame {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* Use padding instead of fixed insets so the root document scrolls and iOS can collapse
-     its toolbar while still honoring dynamic safe areas. */
   min-height: calc(var(--viewport-unit) * 100);
-  padding:
-    var(--safe-top)
-    var(--safe-right)
-    var(--safe-bottom)
-    var(--safe-left);
-  overflow: hidden;
+  overflow: visible; /* Не обрезаем контент, чтобы прокрутка происходила у body, а не во внутреннем контейнере. */
   contain: layout paint size;
   z-index: 0;
 }
