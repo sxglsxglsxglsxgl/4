@@ -11,10 +11,14 @@
     'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-sans: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-top-base: env(safe-area-inset-top, 0px);
+  --safe-right-base: env(safe-area-inset-right, 0px);
+  --safe-bottom-base: env(safe-area-inset-bottom, 0px);
+  --safe-left-base: env(safe-area-inset-left, 0px);
+  --safe-top: var(--safe-top-base);
+  --safe-right: var(--safe-right-base);
+  --safe-bottom: var(--safe-bottom-base);
+  --safe-left: var(--safe-left-base);
   --content-bg: transparent;
 }
 
