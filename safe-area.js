@@ -104,6 +104,7 @@
       }
       lastApplied[side] = value;
       root.style.setProperty(`--safe-area-${side}`, `${value}px`);
+      root.style.setProperty(`--safe-${side}`, `${value}px`);
     });
   }
 

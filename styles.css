@@ -18,6 +18,10 @@
   --safe-area-right: 0px;
   --safe-area-bottom: 0px;
   --safe-area-left: 0px;
+  --safe-top: var(--safe-area-top);
+  --safe-right: var(--safe-area-right);
+  --safe-bottom: var(--safe-area-bottom);
+  --safe-left: var(--safe-area-left);
 }
 
 *,
@@ -30,7 +34,6 @@ html,
 body {
   margin: 0;
   height: auto;
-  min-height: 100vh;
   min-height: 100dvh;
   background: var(--background);
   color: var(--text-strong);
@@ -47,22 +50,22 @@ body {
   flex-direction: column;
   align-items: stretch;
   --body-safe-top: max(
-    var(--safe-area-top, 0px),
+    var(--safe-top, var(--safe-area-top, 0px)),
     var(--env-top, 0px),
     var(--const-top, 0px)
   );
   --body-safe-bottom: max(
-    var(--safe-area-bottom, 0px),
+    var(--safe-bottom, var(--safe-area-bottom, 0px)),
     var(--env-bot, 0px),
     var(--const-bot, 0px)
   );
   --body-safe-right: max(
-    var(--safe-area-right, 0px),
+    var(--safe-right, var(--safe-area-right, 0px)),
     var(--env-right, 0px),
     var(--const-right, 0px)
   );
   --body-safe-left: max(
-    var(--safe-area-left, 0px),
+    var(--safe-left, var(--safe-area-left, 0px)),
     var(--env-left, 0px),
     var(--const-left, 0px)
   );
@@ -76,25 +79,26 @@ body {
 
 .site-header {
   position: relative;
-  display: grid;
-  place-items: center;
-  align-content: center;
-  padding: 0 clamp(24px, 6vw, 72px);
-  text-align: center;
-  min-height: calc(100dvh - (var(--body-safe-top) + var(--body-safe-bottom)));
+  display: block;
+  padding: 0 clamp(16px, 6vw, 40px);
 }
 
 .brand {
-  font-size: clamp(32px, 9vw, 72px);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
 }
 
 .burger {
-  position: absolute;
-  top: calc(var(--body-safe-top) + 16px);
-  right: calc(var(--body-safe-right) + 16px);
+  position: fixed;
+  top: calc(var(--body-safe-top) + 12px);
+  right: calc(var(--body-safe-right) + 12px);
   appearance: none;
   border: 0;
   background: rgba(255, 255, 255, 0.04);
@@ -108,6 +112,38 @@ body {
   cursor: pointer;
   color: var(--text-strong);
   transition: background 220ms ease, border-color 220ms ease, transform 220ms ease;
+}
+
+main {
+  flex: 1;
+  display: block;
+}
+
+.hero {
+  min-height: calc(100dvh - var(--body-safe-top) - var(--body-safe-bottom));
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding:
+    calc(var(--body-safe-top) + 24px)
+    calc(var(--body-safe-right) + 24px)
+    calc(var(--body-safe-bottom) + 24px)
+    calc(var(--body-safe-left) + 24px);
+}
+
+.brand-title {
+  margin: 0;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: clamp(36px, 8vw, 96px);
+}
+
+@supports (height: 100dvh) {
+  .hero {
+    min-height: calc(100dvh - var(--body-safe-top) - var(--body-safe-bottom));
+  }
 }
 
 .burger:focus-visible {
