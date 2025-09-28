@@ -59,6 +59,19 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Страхуемся от временных "нулей" из JS: берём максимум из JS, env() и legacy constant(). */
+  padding-top: max(var(--safe-top, 0px), env(safe-area-inset-top), constant(safe-area-inset-top));
+  padding-bottom: max(
+    var(--safe-bottom, 0px),
+    env(safe-area-inset-bottom),
+    constant(safe-area-inset-bottom)
+  );
+  scroll-padding-top: calc(
+    max(var(--safe-top, 0px), env(safe-area-inset-top), constant(safe-area-inset-top)) + 8px
+  );
+  scroll-padding-bottom: calc(
+    max(var(--safe-bottom, 0px), env(safe-area-inset-bottom), constant(safe-area-inset-bottom)) + 8px
+  );
 }
 
 .safe-frame {
