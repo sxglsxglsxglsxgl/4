@@ -62,15 +62,11 @@ body {
 }
 
 .safe-frame {
-  position: fixed;
-  top: var(--safe-top);
-  right: var(--safe-right);
-  bottom: var(--safe-bottom);
-  left: var(--safe-left);
+  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  contain: layout paint size;
+  min-height: calc(var(--viewport-unit) * 100);
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
   z-index: 0;
 }
 
@@ -98,9 +94,6 @@ body.is-menu-closing {
 .safe-frame .content {
   position: relative;
   flex: 1 1 auto;
-  height: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .content {
