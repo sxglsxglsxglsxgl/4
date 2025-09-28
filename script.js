@@ -494,28 +494,124 @@
 
   if (!trigger || !container) return;
 
-  function getAbsoluteOffsetTop(element) {
-    let current = element;
-    let offset = 0;
+  const scrollContainer = container.closest('.content');
 
-    while (current) {
-      offset += current.offsetTop || 0;
-      current = current.offsetParent;
+  function resolveScrollElement() {
+    if (scrollContainer instanceof HTMLElement) {
+      const style = window.getComputedStyle(scrollContainer);
+      const overflowY = style.overflowY || style.overflow;
+      const hasScrollableOverflow = /(auto|scroll|overlay)/.test(overflowY);
+      const canScroll =
+        hasScrollableOverflow && scrollContainer.scrollHeight - scrollContainer.clientHeight > 1;
+
+      if (canScroll) {
+        return scrollContainer;
+      }
     }
 
-    return offset;
+    return document.scrollingElement || document.documentElement;
   }
+
+  const scrollElement = resolveScrollElement();
+  const isDocumentScrollElement =
+    scrollElement === document.documentElement || scrollElement === document.body;
 
   function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
   }
 
+  function getScrollTop() {
+    if (isDocumentScrollElement) {
+      if (typeof window.pageYOffset === 'number') {
+        return window.pageYOffset;
+      }
+      if (scrollElement && typeof scrollElement.scrollTop === 'number') {
+        return scrollElement.scrollTop;
+      }
+      if (document.body && typeof document.body.scrollTop === 'number') {
+        return document.body.scrollTop;
+      }
+      return 0;
+    }
+
+    return scrollElement.scrollTop || 0;
+  }
+
+  function getScrollLeft() {
+    if (isDocumentScrollElement) {
+      if (typeof window.pageXOffset === 'number') {
+        return window.pageXOffset;
+      }
+      if (scrollElement && typeof scrollElement.scrollLeft === 'number') {
+        return scrollElement.scrollLeft;
+      }
+      if (document.body && typeof document.body.scrollLeft === 'number') {
+        return document.body.scrollLeft;
+      }
+      return 0;
+    }
+
+    return scrollElement.scrollLeft || 0;
+  }
+
+  function getViewportHeight() {
+    if (isDocumentScrollElement) {
+      return (
+        window.innerHeight ||
+        (document.documentElement && document.documentElement.clientHeight) ||
+        (document.body && document.body.clientHeight) ||
+        0
+      );
+    }
+
+    return scrollElement.clientHeight;
+  }
+
+  function getDocumentHeight() {
+    if (isDocumentScrollElement) {
+      return Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight,
+        document.body.clientHeight,
+        document.documentElement.clientHeight
+      );
+    }
+
+    return scrollElement.scrollHeight;
+  }
+
+  function performScroll(left, top, behavior) {
+    const options = { left, top };
+    if (behavior) {
+      options.behavior = behavior;
+    }
+
+    if (isDocumentScrollElement) {
+      window.scrollTo(options);
+      return;
+    }
+
+    if (typeof scrollElement.scrollTo === 'function') {
+      scrollElement.scrollTo(options);
+    } else {
+      if (typeof left === 'number') {
+        scrollElement.scrollLeft = left;
+      }
+      if (typeof top === 'number') {
+        scrollElement.scrollTop = top;
+      }
+    }
+  }
+
   function animateScrollTo(top, duration) {
-    const currentX = window.scrollX || window.pageXOffset || 0;
-    const start = window.scrollY || window.pageYOffset || 0;
-    const distance = top - start;
+    const startX = getScrollLeft();
+    const startY = getScrollTop();
+    const distance = top - startY;
+
     if (distance === 0 || duration <= 0) {
-      window.scrollTo({ left: currentX, top });
+      performScroll(startX, top);
       return;
     }
 
@@ -528,7 +624,7 @@
       const elapsed = now - startTime;
       const progress = clamp(elapsed / duration, 0, 1);
       const eased = easeInOutCubic(progress);
-      window.scrollTo({ left: currentX, top: Math.round(start + distance * eased) });
+      performScroll(startX, Math.round(startY + distance * eased));
       if (progress < 1) {
         requestAnimationFrame(step);
       }
@@ -542,20 +638,20 @@
     const prefersReducedMotion =
       window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-    const targetHeight = target.offsetHeight || target.getBoundingClientRect().height || 0;
-    const documentHeight = Math.max(
-      document.body.scrollHeight,
-      document.documentElement.scrollHeight,
-      document.body.offsetHeight,
-      document.documentElement.offsetHeight,
-      document.body.clientHeight,
-      document.documentElement.clientHeight
-    );
-
+    const viewportHeight = getViewportHeight();
+    const targetRect = target.getBoundingClientRect();
+    const targetHeight = targetRect.height || target.offsetHeight || 0;
+    const documentHeight = getDocumentHeight();
     const maxScroll = Math.max(0, documentHeight - viewportHeight);
 
-    let destination = getAbsoluteOffsetTop(target);
+    let destination;
+
+    if (isDocumentScrollElement) {
+      destination = getScrollTop() + targetRect.top;
+    } else {
+      const containerRect = scrollElement.getBoundingClientRect();
+      destination = scrollElement.scrollTop + (targetRect.top - containerRect.top);
+    }
 
     if (targetHeight < viewportHeight) {
       destination -= (viewportHeight - targetHeight) / 2;
@@ -564,7 +660,7 @@
     destination = clamp(destination, 0, maxScroll);
 
     if (prefersReducedMotion) {
-      window.scrollTo({ top: destination, behavior: 'auto' });
+      performScroll(getScrollLeft(), destination, 'auto');
       return;
     }
 

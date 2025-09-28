@@ -11,10 +11,38 @@
     'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-sans: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-top-base: env(safe-area-inset-top, 0px);
+  --safe-right-base: env(safe-area-inset-right, 0px);
+  --safe-bottom-base: env(safe-area-inset-bottom, 0px);
+  --safe-left-base: env(safe-area-inset-left, 0px);
+  --safe-top-legacy: 0px;
+  --safe-right-legacy: 0px;
+  --safe-bottom-legacy: 0px;
+  --safe-left-legacy: 0px;
+  --safe-area-top: var(--safe-top-base);
+  --safe-area-right: var(--safe-right-base);
+  --safe-area-bottom: var(--safe-bottom-base);
+  --safe-area-left: var(--safe-left-base);
+  --safe-top: max(
+    var(--safe-area-top, 0px),
+    var(--safe-top-base),
+    var(--safe-top-legacy)
+  );
+  --safe-right: max(
+    var(--safe-area-right, 0px),
+    var(--safe-right-base),
+    var(--safe-right-legacy)
+  );
+  --safe-bottom: max(
+    var(--safe-area-bottom, 0px),
+    var(--safe-bottom-base),
+    var(--safe-bottom-legacy)
+  );
+  --safe-left: max(
+    var(--safe-area-left, 0px),
+    var(--safe-left-base),
+    var(--safe-left-legacy)
+  );
   --content-bg: transparent;
 }
 
@@ -27,6 +55,15 @@
 @supports (height: 100svh) and not (height: 100dvh) {
   :root {
     --viewport-unit: 1svh;
+  }
+}
+
+@supports (padding-top: constant(safe-area-inset-top)) {
+  :root {
+    --safe-top-legacy: constant(safe-area-inset-top);
+    --safe-right-legacy: constant(safe-area-inset-right);
+    --safe-bottom-legacy: constant(safe-area-inset-bottom);
+    --safe-left-legacy: constant(safe-area-inset-left);
   }
 }
 
@@ -59,18 +96,16 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  scroll-padding-top: calc(var(--safe-top) + 8px);
+  scroll-padding-bottom: calc(var(--safe-bottom) + 8px);
 }
 
 .safe-frame {
-  position: fixed;
-  top: var(--safe-top);
-  right: var(--safe-right);
-  bottom: var(--safe-bottom);
-  left: var(--safe-left);
+  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  contain: layout paint size;
+  min-height: calc(var(--viewport-unit) * 100);
+  padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
   z-index: 0;
 }
 
@@ -98,9 +133,6 @@ body.is-menu-closing {
 .safe-frame .content {
   position: relative;
   flex: 1 1 auto;
-  height: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .content {
