@@ -9,8 +9,8 @@
     <title>Safe Area Background Test</title>
     <style>
       :root {
-        --safe-top: env(safe-area-inset-top, 0px);
-        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-area-top: env(safe-area-inset-top, 0px);
+        --safe-area-bottom: env(safe-area-inset-bottom, 0px);
       }
 
       html,
@@ -40,8 +40,8 @@
       </div>
     </main>
     <script>
-      console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-top'));
-      console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom'));
+      console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-top'));
+      console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-bottom'));
     </script>
   </body>
 </html>

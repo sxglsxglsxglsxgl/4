@@ -46,6 +46,7 @@
     return Math.max(prev, env);
   };
 
+  // Берём максимум из визуального viewport и env()/constant(), а нули сглаживаем "липким" значением.
   const calc = () => {
     const vv = window.visualViewport;
 
@@ -73,10 +74,10 @@
     lastLeft = stick(lastLeft, nextLeft, envLeft);
     lastRight = stick(lastRight, nextRight, envRight);
 
-    setIfChanged('--safe-top', lastTop);
-    setIfChanged('--safe-bottom', lastBottom);
-    setIfChanged('--safe-left', lastLeft);
-    setIfChanged('--safe-right', lastRight);
+    setIfChanged('--safe-area-top', lastTop);
+    setIfChanged('--safe-area-bottom', lastBottom);
+    setIfChanged('--safe-area-left', lastLeft);
+    setIfChanged('--safe-area-right', lastRight);
   };
 
   let raf = null;

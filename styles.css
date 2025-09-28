@@ -11,10 +11,10 @@
     'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-sans: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
   --content-bg: transparent;
 }
 
@@ -43,12 +43,18 @@
 html,
 body {
   margin: 0;
+  height: auto;
   /* порядок высот: сначала старый fallback, затем современные динамические */
   min-height: 100vh;
   min-height: 100svh;
   min-height: 100dvh;
   background: #000;
   color: #fff;
+  /* Корневой скролл обязателен для автоскрытия браузерного UI. */
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
   /* iOS: раскрытые панели браузера остаются системным хромом — unsafe-зоны видны лишь при схлопнутых панелях или в PWA */
 }
 
@@ -60,30 +66,30 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   /* Страхуемся от временных "нулей" из JS: берём максимум из JS, env() и legacy constant(). */
-  padding-top: max(var(--safe-top, 0px), env(safe-area-inset-top), constant(safe-area-inset-top));
+  padding-top: max(var(--safe-area-top, 0px), env(safe-area-inset-top), constant(safe-area-inset-top));
   padding-bottom: max(
-    var(--safe-bottom, 0px),
+    var(--safe-area-bottom, 0px),
     env(safe-area-inset-bottom),
     constant(safe-area-inset-bottom)
   );
   scroll-padding-top: calc(
-    max(var(--safe-top, 0px), env(safe-area-inset-top), constant(safe-area-inset-top)) + 8px
+    max(var(--safe-area-top, 0px), env(safe-area-inset-top), constant(safe-area-inset-top)) + 8px
   );
   scroll-padding-bottom: calc(
-    max(var(--safe-bottom, 0px), env(safe-area-inset-bottom), constant(safe-area-inset-bottom)) + 8px
+    max(var(--safe-area-bottom, 0px), env(safe-area-inset-bottom), constant(safe-area-inset-bottom)) + 8px
   );
 }
 
 .safe-frame {
-  position: fixed;
-  top: var(--safe-top);
-  right: var(--safe-right);
-  bottom: var(--safe-bottom);
-  left: var(--safe-left);
+  /* Скролл держим у body: каркас остаётся в нормальном потоке и не перехватывает жесты. */
+  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  contain: layout paint size;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  overflow: visible;
+  contain: none;
   z-index: 0;
 }
 
@@ -91,9 +97,9 @@ body {
   content: '';
   position: fixed;
   top: 0;
-  right: var(--safe-right);
-  left: var(--safe-left);
-  height: var(--safe-top);
+  right: var(--safe-area-right);
+  left: var(--safe-area-left);
+  height: var(--safe-area-top);
   background-image: linear-gradient(
     to top,
     var(--content-bg, var(--background, #000)) 0%,
@@ -103,17 +109,10 @@ body {
   z-index: 1;
 }
 
-body.has-menu-open,
-body.is-menu-closing {
-  overflow: hidden;
-}
-
 .safe-frame .content {
   position: relative;
   flex: 1 1 auto;
-  height: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
 }
 
 .content {
@@ -121,7 +120,7 @@ body.is-menu-closing {
   min-height: 100vh;
   min-height: 100svh;
   min-height: 100dvh;
-  min-height: calc((var(--viewport-unit) * 100) - (var(--safe-top) + var(--safe-bottom)));
+  min-height: calc((var(--viewport-unit) * 100) - (var(--safe-area-top) + var(--safe-area-bottom)));
   padding: 16px;
   background: var(--content-bg);
 }
@@ -242,10 +241,10 @@ body.is-menu-closing .site-menu-toggle {
 
 .site-menu {
   position: fixed;
-  top: calc(var(--safe-top) - var(--overscroll-bleed));
-  right: var(--safe-right);
-  bottom: calc(var(--safe-bottom) - var(--overscroll-bleed));
-  left: var(--safe-left);
+  top: calc(var(--safe-area-top) - var(--overscroll-bleed));
+  right: var(--safe-area-right);
+  bottom: calc(var(--safe-area-bottom) - var(--overscroll-bleed));
+  left: var(--safe-area-left);
   display: grid;
   place-items: center;
   padding:
@@ -421,8 +420,8 @@ body.is-menu-closing .site-lockup {
 
 .site-menu-toggle {
   position: fixed;
-  top: calc(var(--safe-top) + clamp(24px, 4vw, 48px));
-  right: calc(var(--safe-right) + clamp(24px, 4vw, 48px));
+  top: calc(var(--safe-area-top) + clamp(24px, 4vw, 48px));
+  right: calc(var(--safe-area-right) + clamp(24px, 4vw, 48px));
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -629,8 +628,8 @@ body.is-menu-closing .site-menu-toggle__icon span:nth-child(3) {
   }
 
   .site-menu-toggle {
-    top: calc(var(--safe-top) + clamp(20px, 9vw, 36px));
-    right: calc(var(--safe-right) + clamp(20px, 9vw, 36px));
+    top: calc(var(--safe-area-top) + clamp(20px, 9vw, 36px));
+    right: calc(var(--safe-area-right) + clamp(20px, 9vw, 36px));
     width: clamp(40px, 14vw, 52px);
     height: clamp(40px, 14vw, 52px);
   }
