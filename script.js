@@ -16,7 +16,23 @@
     '[tabindex]:not([tabindex="-1"])'
   ];
 
+  const TRANSITION_FALLBACK = 650;
+
   let lastFocusedElement = null;
+  let isMenuOpen = false;
+  let closingTimerId = null;
+  let closingHandler = null;
+
+  function cancelClosing() {
+    if (closingHandler) {
+      menu.removeEventListener('transitionend', closingHandler);
+      closingHandler = null;
+    }
+    if (closingTimerId != null) {
+      window.clearTimeout(closingTimerId);
+      closingTimerId = null;
+    }
+  }
 
   function getFocusableElements() {
     return Array.from(menu.querySelectorAll(FOCUSABLE_SELECTORS.join(','))).filter((element) => {
@@ -82,42 +98,84 @@
   }
 
   function openMenu() {
-    if (!menu.hidden) return;
+    if (isMenuOpen) return;
 
-    lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    cancelClosing();
+
+    lastFocusedElement =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     menu.hidden = false;
     menu.removeAttribute('hidden');
     menu.setAttribute('aria-hidden', 'false');
+    menu.dataset.state = 'opening';
 
     document.body.classList.add('menu-open');
     setExpandedState(true);
+    isMenuOpen = true;
+
+    requestAnimationFrame(() => {
+      if (menu.dataset.state === 'opening') {
+        menu.dataset.state = 'open';
+      }
+    });
 
     focusInitialElement();
     document.addEventListener('keydown', handleKeydown);
   }
 
   function closeMenu({ focusToggle = true } = {}) {
-    if (menu.hidden) return;
+    const state = menu.dataset.state;
+    if (!isMenuOpen && state !== 'opening' && state !== 'open') {
+      return;
+    }
+    if (state === 'closing') {
+      return;
+    }
 
-    menu.setAttribute('aria-hidden', 'true');
-    menu.hidden = true;
-    document.body.classList.remove('menu-open');
+    cancelClosing();
+
+    const focusShouldReturn = focusToggle;
+
+    isMenuOpen = false;
     setExpandedState(false);
+    menu.setAttribute('aria-hidden', 'true');
     document.removeEventListener('keydown', handleKeydown);
 
-    if (focusToggle) {
-      const focusTarget =
-        (lastFocusedElement && document.body.contains(lastFocusedElement)) ? lastFocusedElement : toggle;
+    const finalize = () => {
+      cancelClosing();
+      menu.hidden = true;
+      menu.removeAttribute('data-state');
+      document.body.classList.remove('menu-open');
 
-      if (focusTarget && typeof focusTarget.focus === 'function') {
-        requestAnimationFrame(() => focusTarget.focus());
+      if (focusShouldReturn) {
+        const focusTarget =
+          lastFocusedElement && document.body.contains(lastFocusedElement)
+            ? lastFocusedElement
+            : toggle;
+
+        if (focusTarget && typeof focusTarget.focus === 'function') {
+          requestAnimationFrame(() => focusTarget.focus());
+        }
       }
-    }
+
+      lastFocusedElement = null;
+    };
+
+    closingHandler = (event) => {
+      if (event.target !== menu || event.propertyName !== 'opacity') {
+        return;
+      }
+      finalize();
+    };
+
+    menu.dataset.state = 'closing';
+    menu.addEventListener('transitionend', closingHandler);
+    closingTimerId = window.setTimeout(finalize, TRANSITION_FALLBACK);
   }
 
   toggle.addEventListener('click', () => {
-    if (menu.hidden) {
+    if (!isMenuOpen) {
       openMenu();
     } else {
       closeMenu();
