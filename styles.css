@@ -46,44 +46,28 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  padding-top: max(
+  --body-safe-top: max(
     var(--safe-area-top, 0px),
     var(--env-top, 0px),
     var(--const-top, 0px)
   );
-  padding-bottom: max(
+  --body-safe-bottom: max(
     var(--safe-area-bottom, 0px),
     var(--env-bot, 0px),
     var(--const-bot, 0px)
   );
-  scroll-padding-top: calc(
-    max(var(--safe-area-top, 0px), var(--env-top, 0px), var(--const-top, 0px)) + 8px
-  );
-  scroll-padding-bottom: calc(
-    max(var(--safe-area-bottom, 0px), var(--env-bot, 0px), var(--const-bot, 0px)) + 8px
-  );
+  padding-top: var(--body-safe-top);
+  padding-bottom: var(--body-safe-bottom);
+  scroll-padding-top: calc(var(--body-safe-top) + 8px);
+  scroll-padding-bottom: calc(var(--body-safe-bottom) + 8px);
 }
 
-main {
-  display: block;
-}
-
-.site-header,
-.hero {
+.site-header {
   display: grid;
   place-items: center;
   padding: clamp(32px, 8vw, 96px) clamp(24px, 6vw, 64px);
   text-align: center;
-}
-
-.site-header {
-  min-height: 60vh;
-}
-
-.site-header__inner {
-  display: grid;
-  gap: clamp(16px, 4vw, 32px);
-  justify-items: center;
+  min-height: calc(100dvh - (var(--body-safe-top) + var(--body-safe-bottom)));
 }
 
 .brand {
@@ -91,20 +75,6 @@ main {
   font-weight: 600;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-}
-
-.hero {
-  min-height: 40vh;
-  flex: 1 1 auto;
-  background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.08), transparent 60%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
-}
-
-.hero__tagline {
-  margin: 0;
-  max-width: 48ch;
-  font-size: clamp(18px, 3vw, 28px);
-  color: var(--text-muted);
 }
 
 .burger {
