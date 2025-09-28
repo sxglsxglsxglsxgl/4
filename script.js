@@ -494,6 +494,12 @@
 
   if (!trigger || !container) return;
 
+  function getSafeInset(name) {
+    const styles = getComputedStyle(document.documentElement);
+    const value = parseFloat(styles.getPropertyValue(name));
+    return Number.isFinite(value) ? value : 0;
+  }
+
   function getAbsoluteOffsetTop(element) {
     let current = element;
     let offset = 0;
@@ -553,12 +559,17 @@
       document.documentElement.clientHeight
     );
 
+    const safeTop = getSafeInset('--safe-top');
+    const safeBottom = getSafeInset('--safe-bottom');
+    const safeViewport = Math.max(0, viewportHeight - safeTop - safeBottom);
     const maxScroll = Math.max(0, documentHeight - viewportHeight);
 
     let destination = getAbsoluteOffsetTop(target);
 
-    if (targetHeight < viewportHeight) {
-      destination -= (viewportHeight - targetHeight) / 2;
+    if (targetHeight < safeViewport) {
+      destination -= safeTop + (safeViewport - targetHeight) / 2;
+    } else {
+      destination -= safeTop;
     }
 
     destination = clamp(destination, 0, maxScroll);

@@ -11,10 +11,14 @@
     'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-serif: 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
   --font-sans: 'SF Pro Display', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Inter', sans-serif;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-top-env: env(safe-area-inset-top, 0px);
+  --safe-right-env: env(safe-area-inset-right, 0px);
+  --safe-bottom-env: env(safe-area-inset-bottom, 0px);
+  --safe-left-env: env(safe-area-inset-left, 0px);
+  --safe-top: var(--safe-top-env);
+  --safe-right: var(--safe-right-env);
+  --safe-bottom: var(--safe-bottom-env);
+  --safe-left: var(--safe-left-env);
   --content-bg: transparent;
 }
 
@@ -52,6 +56,11 @@ body {
   /* iOS: раскрытые панели браузера остаются системным хромом — unsafe-зоны видны лишь при схлопнутых панелях или в PWA */
 }
 
+html {
+  scroll-padding-top: var(--safe-top);
+  scroll-padding-bottom: var(--safe-bottom);
+}
+
 body {
   position: relative;
   color: var(--text-strong);
@@ -62,15 +71,18 @@ body {
 }
 
 .safe-frame {
-  position: fixed;
-  top: var(--safe-top);
-  right: var(--safe-right);
-  bottom: var(--safe-bottom);
-  left: var(--safe-left);
+  position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  contain: layout paint size;
+  min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
+  min-height: calc(var(--viewport-unit) * 100);
+  padding-top: var(--safe-top);
+  padding-right: var(--safe-right);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  box-sizing: border-box;
   z-index: 0;
 }
 
@@ -98,9 +110,7 @@ body.is-menu-closing {
 .safe-frame .content {
   position: relative;
   flex: 1 1 auto;
-  height: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
+  min-height: max(0px, calc((var(--viewport-unit) * 100) - (var(--safe-top) + var(--safe-bottom))));
 }
 
 .content {
