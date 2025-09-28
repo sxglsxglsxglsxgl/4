@@ -120,7 +120,7 @@
     </div>
     <pre
       id="safe-debug"
-      style="position:fixed;left:calc(var(--safe-left) + 8px);bottom:calc(var(--safe-bottom) + 8px);padding:6px 8px;background:rgba(0,0,0,.6);color:#0f0;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;z-index:99999;border-radius:6px;"
+      style="position:fixed;left:calc(var(--safe-area-left) + 8px);bottom:calc(var(--safe-area-bottom) + 8px);padding:6px 8px;background:rgba(0,0,0,.6);color:#0f0;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;z-index:99999;border-radius:6px;"
     ></pre>
   </div>
 
@@ -142,8 +142,8 @@
       "We work from Saint Petersburg, collaborating around the world on projects that make life a little more thoughtful."
     ];
     window.SITE_CONFIG = { SENTENCES };
-    console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-top'));
-    console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom'));
+    console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-top'));
+    console.log(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-bottom'));
   </script>
   <script defer src="./script.js"></script>
   <script>
@@ -156,10 +156,10 @@
       }
       function dump() {
         const cs = getComputedStyle(document.documentElement);
-        const t = cs.getPropertyValue('--safe-top').trim();
-        const r = cs.getPropertyValue('--safe-right').trim();
-        const b = cs.getPropertyValue('--safe-bottom').trim();
-        const l = cs.getPropertyValue('--safe-left').trim();
+        const t = cs.getPropertyValue('--safe-area-top').trim();
+        const r = cs.getPropertyValue('--safe-area-right').trim();
+        const b = cs.getPropertyValue('--safe-area-bottom').trim();
+        const l = cs.getPropertyValue('--safe-area-left').trim();
         document.getElementById('safe-debug').textContent =
           `safe-top: ${t}\nsafe-right: ${r}\nsafe-bottom: ${b}\nsafe-left: ${l}`;
       }
