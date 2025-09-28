@@ -15,6 +15,10 @@
   --safe-right: env(safe-area-inset-right, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
+  --safe-area-top: var(--safe-top);
+  --safe-area-right: var(--safe-right);
+  --safe-area-bottom: var(--safe-bottom);
+  --safe-area-left: var(--safe-left);
   --content-bg: transparent;
 }
 
@@ -59,6 +63,19 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Двойной источник истины для safe-зон: JS-переменные + системные env()/constant(). */
+  padding-top: max(var(--safe-area-top, 0px), env(safe-area-inset-top), constant(safe-area-inset-top));
+  padding-bottom: max(
+    var(--safe-area-bottom, 0px),
+    env(safe-area-inset-bottom),
+    constant(safe-area-inset-bottom)
+  );
+  scroll-padding-top: calc(
+    max(var(--safe-area-top, 0px), env(safe-area-inset-top), constant(safe-area-inset-top)) + 8px
+  );
+  scroll-padding-bottom: calc(
+    max(var(--safe-area-bottom, 0px), env(safe-area-inset-bottom), constant(safe-area-inset-bottom)) + 8px
+  );
 }
 
 .safe-frame {
